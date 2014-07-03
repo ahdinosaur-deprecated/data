@@ -98,6 +98,7 @@ Registry.prototype.define = function (ldr, descriptor) {
       value: function () {
         return _.extend(this.toJSON(), {
           "@context": this.toContext(),
+          type: this._descriptor.type,
         });
       },
     },

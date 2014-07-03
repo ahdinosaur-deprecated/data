@@ -25,7 +25,6 @@ var test = module.exports = {
       "id": "@id",
       "type": "@type",
     },
-    id: /.*/,
     type: ["Person", "foaf:Person"],
     name: "Mikey",
   }],
