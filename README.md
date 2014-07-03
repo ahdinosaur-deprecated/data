@@ -1,3 +1,5 @@
-#  LDO (Linked Data Object)
+#  LDR (Linked Data Registry)
 
-LDO translates a JSON-Schema for Linked Data into an Object constructor.
+register Linked Data using JSON-Schema.
+
+### work in progress
