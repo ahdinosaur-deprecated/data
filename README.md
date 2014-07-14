@@ -1,5 +1,111 @@
-#  LDR (Linked Data Registry)
+#  OpenData
 
-register Linked Data using JSON-Schema.
+Linked Data models described using JSON-Schema and operated on as ES6 `Object`s.
 
-### work in progress
+### WORK IN PROGRESS
+
+## dream code
+
+```javascript
+var jjv = require('jjv');
+var OpenData = require('opendata')(jjv);
+
+var Person = OpenData.define({
+  id: "/Person",
+  prefixes: {
+    "": "http://schema.org/",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "org": "http://www.w3.org/TR/vocab-org#",
+  },
+  type: "Person",
+  context: "foaf:Person",
+  properties: {
+    name: {
+      type: "string",
+      context: "foaf:name",
+    },
+    memberships: {
+      type: "array",
+      context: "org:hasMembership",
+      items: {
+        reverse: "member",
+        "$ref": "/Membership",
+      },
+    },
+    // TODO 'memberOf' computed (get/set) property
+  },
+});
+
+var bob = Person({
+  name: "Bob Loblaw",
+});
+console.log(bob.toJSONLD())
+//{
+//  "@context": {
+//    "@vocab": "http://schema.org/",
+//    "foaf": "http://xmlns.com/foaf/0.1/",
+//    "org": "http://www.w3.org/TR/vocab-org#",
+//    "type": "@type",
+//    "id": "@id"
+//  },
+//  "name": "Bob Loblaw",
+//  "memberships": []
+//}
+
+var Group = OpenData.define({
+  id: "/Group",
+  prefixes: {
+    "": "http://schema.org/",
+    "foaf": "http://xmlns.com/foaf/0.1#",
+    "org": "http://www.w3.org/TR/vocab-org#"
+  },
+  type: "Group",
+  context: "org:Organization"
+  properties: {
+    name: {
+      type: "string",
+    },
+    memberships: {
+      type: "array",
+      context: "org:hasMembership",
+      items: {
+        anyOf: [{
+          reverse: "member",
+          "$ref": "/Membership",
+        }, {
+          reverse: "group",
+          "$ref": "/Membership",
+        }],
+      },
+    },
+    // TODO 'memberOf' computed (get/set) property
+    // TODO 'members' computed (get/set) property
+  },
+});
+
+var Membership = OpenData.define({
+
+  id: "/Membership",
+  prefixes: {
+    "": "http://schema.org/",
+    "foaf": "http://xmlns.com/foaf/0.1#",
+    "org": "http://www.w3.org/TR/vocab-org#"
+  },
+  type: "Membership",
+  context: "org:Membership"
+  properties: {
+    member: {
+      context: "org:member",
+      anyOf: [{
+        "$ref": "/Person",
+      }, {
+        "$ref": "/Group",
+      }],
+    },
+    group: {
+      "context": "org:organization",
+      "$ref": "/Group"
+    },
+  },
+});
+```

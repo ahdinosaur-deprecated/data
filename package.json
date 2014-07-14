@@ -1,7 +1,7 @@
 {
-  "name": "ldr",
+  "name": "opendata",
   "version": "0.0.0",
-  "description": "linked data registry",
+  "description": "linked data",
   "main": "index.js",
   "directories": {
     "test": "test"
@@ -11,9 +11,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/open-app/ldr.git"
+    "url": "https://github.com/open-app/opendata.git"
   },
   "keywords": [
+    "openapp",
     "linked data",
     "jsonld",
     "data",
@@ -23,9 +24,9 @@
   "author": "Open-App",
   "license": "AGPLv3",
   "bugs": {
-    "url": "https://github.com/open-app/ldr/issues"
+    "url": "https://github.com/open-app/opendata/issues"
   },
-  "homepage": "https://github.com/open-app/ldr",
+  "homepage": "https://github.com/open-app/opendata",
   "dependencies": {
     "jjv": "^1.0.0",
     "lodash": "^2.4.1"
