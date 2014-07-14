@@ -1,113 +1,119 @@
-var jjv = require('jjv');
 var _ = require('lodash');
+var predefine = require('predefine');
 
-function Registry () {
-  this.jjv = jjv();
-  this.validate = this.jjv.validate.bind(this.jjv);
+function Registry (jjv) {
+  if (!(this instanceof Registry)) return new Registry(jjv);
+  this.jjv = jjv;
 }
 
-Registry.prototype.define = function (ldr, descriptor) {
-  var name = descriptor.name;
+Registry.prototype.define = function (schema) {
+  var jjv = this.jjv;
 
-  // add types
-  // add formats
-  // add checks
-  // add type coercions
-  // add schema
-  this.jjv.addSchema(name, descriptor.schema);
+  // save type for later
+  var type = schema.type;
 
-  // find nested definitions
+  // jjv expects type to be object
+  schema.type = 'object';
 
-  var Definition = function (obj) {
-    if (this._ldr.validate(obj)) {
-      throw new Error("invalid object passed to " + name + " constructor.");
+  // add schema to jjv
+  jjv.addSchema(schema.id, schema);
+
+  //
+  // define Data constructor
+  //
+  var Data = function (obj) {
+    if (!(this instanceof Data)) return new Data(obj);
+    if (this.validate(obj)) {
+      throw new Error("invalid object passed to " + schema.id + " constructor.");
     }
+
+    var property = predefine(this, {
+      enumerable: true,
+      writeable: true,
+    });
+
+    // set type property
+    property("type", schema.type);
+
+    // TODO handle nested schemas (by $ref)
+
+    // define shallow properties
     _.forEach(obj, function (val, key) {
-      this[key] = val;
+      // if not nested then
+      property(key, val);
     }.bind(this));
   };
-  Definition.name = name;
-  Object.defineProperties(Definition.prototype, {
-    "_ldr": {
-      enumerable: false,
-      configurable: true,
-      writable: false,
-      value: ldr,
-    },
-    "_descriptor": {
-      enumerable: false,
-      configurable: true,
-      writable: false,
-      value: descriptor,
-    },
-    "validate": {
-      enumerable: false,
-      configurable: true,
-      writable: false,
-      value: function (options) {
-        return this._ldr.validate(name, this.toJSON());
-      },
-    },
-    "toJSON": {
-      enumerable: false,
-      configurable: true,
-      writable: true,
-      value: function () {
-        // create object to return
-        var json = {};
-        // set id
-        // set type
-        // set properties
-        _.forIn(this, function (val, key) {
-          json[key] = val;
-        });
-        // TODO set properties of nested objects
-        return json;
-      },
-    },
-    "toContext": {
-      enumerable: false,
-      configurable: true,
-      writable: true,
-      value: function () {
-        var context = {
-          id: "@id",
-          type: "@type",
-        };
-        // get prefixes
-        _.forIn(this._descriptor.prefixes, function (val, key) {
-          if (_.isString(key) && _.isEmpty(key)) {
-            key = "@vocab";
-          }
-          context[key] = val;
-        });
-        // get properties
-        _.forIn(this._descriptor.properties, function (propDescriptor, propName) {
-          if (propDescriptor.context) {
-            context[propName] = propDescriptor.context;
-          }
-        });
-        // TODO merge context of nested objects
-        return context;
-      }
-    },
-    "toJSONLD": {
-      enumerable: false,
-      configurable: true,
-      writable: true,
-      value: function () {
-        return _.extend(this.toJSON(), {
-          "@context": this.toContext(),
-          type: this._descriptor.type,
-        });
-      },
-    },
-  });
-  return Definition;
-}
 
-Registry.prototype.use = function (descriptor) {
-  this[descriptor.name] = this.define(this, descriptor);
-}
+  //
+  // setup hidden properties
+  //
+  var hidden = {
+    enumerable: false,
+    writeable: false
+  }
+  // in class
+  var classHidden = predefine(Data, hidden);
+
+  classHidden("__isOpenData", true);
+
+  // in prototype
+  var protoHidden = predefine(Data.prototype, hidden);
+
+  protoHidden("_schema", schema);
+
+  //
+  // setup methods in prototype
+  //
+  var method = predefine(Data.prototype, {
+    enumerable: false,
+    writeable: true,
+  });
+
+  method("validate", function (options) {
+    return jjv.validate(schema.id, this.toJSON())
+  });
+  
+  method("toJSON", function () {
+    // create object to return
+    var json = {};
+    // TODO set properties of nested objects
+    // set own properties
+    _.forIn(this, function (val, key) {
+      json[key] = val;
+    });
+    return json;
+  });
+  
+  method("toContext", function () {
+    var context = {
+      id: "@id",
+      type: "@type",
+    };
+    // get prefixes
+    _.forIn(this._schema.prefixes, function (val, key) {
+      if (_.isString(key) && _.isEmpty(key)) {
+        key = "@vocab";
+      }
+      context[key] = val;
+    });
+    // get property contexts
+    _.forIn(this._schema.properties, function (propschema, propName) {
+      if (propschema.context) {
+        context[propName] = propschema.context;
+      }
+    });
+    // TODO merge context of nested objects
+    return context;
+  });
+  
+  method("toJSONLD", function () {
+    return _.extend(this.toJSON(), {
+      "@context": this.toContext(),
+      type: type,
+    });
+  });
+
+  return Data;
+};
 
 module.exports = Registry;

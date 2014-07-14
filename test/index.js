@@ -1,8 +1,8 @@
 var expect = require('chai').expect;
 var _ = require('lodash');
+var jjv = require('jjv');
 
-var LDR = require('../');
-var ldr = new LDR();
+var OpenData = require('../')(jjv());
 var fixtures = {};
 var dir = __dirname + '/fixtures/';
 [
@@ -12,15 +12,16 @@ var dir = __dirname + '/fixtures/';
 });
 
 _.forEach(fixtures, function (fixture) {
-  var name = fixture.descriptor.name;
-  describe(name, function () {
+  var schemaId = fixture.schema.id;
+  describe(schemaId, function () {
+    var Data;
     it("should load", function () {
-      ldr.use(fixture.descriptor);
-      expect(ldr).to.have.property(name);
+      Data = OpenData.define(fixture.schema);
+      expect(Data).to.have.property('__isOpenData', true);
     });
     it("should correctly .toJSONLD()", function () {
       _.forEach(fixture.inputs, function (input, index) {
-        var out = new ldr[name](input);
+        var out = Data(input);
         expect(out.toJSONLD()).to.deep.equal(fixture.outputs[index]);
       });
     });

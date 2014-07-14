@@ -1,17 +1,14 @@
 var test = module.exports = {
-  descriptor: {
-    name: "Person",
+  schema: {
+    id: "person",
     prefixes: {
       "": "http://schema.org/",
       "foaf": "http://xmlns.com/foaf/0.1/",
     },
     type: ["Person", "foaf:Person"],
-    schema: {
-      type: "object",
-      properties: {
-        name: {
-          type: "string",
-        },
+    properties: {
+      name: {
+        type: "string",
       },
     },
   },
