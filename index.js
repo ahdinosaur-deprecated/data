@@ -23,8 +23,11 @@ var opendata = function opendata (schema) {
   //
   var Data = function (obj) {
     if (!(this instanceof Data)) return new Data(obj);
-    if (this.validate(obj)) {
-      throw new Error("invalid object passed to " + schema.id + " constructor.");
+    var errors;
+    if (errors = this.validate(obj)) {
+      var err = new Error("invalid object passed to " + schema.id + " constructor.")
+      err.errors = errors;
+      throw err;
     }
 
     //
