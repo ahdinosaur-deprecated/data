@@ -1,12 +1,11 @@
 var _ = require('lodash');
 var predefine = require('predefine');
 
-function Registry (jjv) {
-  if (!(this instanceof Registry)) return new Registry(jjv);
-  this.jjv = jjv;
+function OpenData (jjv) {
+  return opendata.bind({ jjv: jjv })
 }
 
-Registry.prototype.define = function (schema) {
+var opendata = function opendata (schema) {
   var jjv = this.jjv;
 
   // save type for later
@@ -116,4 +115,4 @@ Registry.prototype.define = function (schema) {
   return Data;
 };
 
-module.exports = Registry;
+module.exports = OpenData;

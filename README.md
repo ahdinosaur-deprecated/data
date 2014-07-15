@@ -1,6 +1,6 @@
 #  OpenData
 
-Linked Data models described using JSON-Schema and operated on as ES6 `Object`s.
+Linked Data models described using JSON-Schema and operated on as immutable `Map`s, `Set`s, and `Array`s.
 
 ### WORK IN PROGRESS
 
@@ -8,9 +8,10 @@ Linked Data models described using JSON-Schema and operated on as ES6 `Object`s.
 
 ```javascript
 var jjv = require('jjv');
-var OpenData = require('opendata')(jjv);
+var OpenData = require('opendata');
+var opendata = OpenData(jjv);
 
-var Person = OpenData.define({
+var Person = opendata({
   id: "Person",
   prefixes: {
     "": "http://schema.org/",
@@ -51,7 +52,7 @@ console.log(bob.toJSONLD())
 //  "memberships": []
 //}
 
-var Group = OpenData.define({
+var Group = opendata({
   id: "Group",
   prefixes: {
     "": "http://schema.org/",
@@ -82,7 +83,7 @@ var Group = OpenData.define({
   },
 });
 
-var Membership = OpenData.define({
+var Membership = opendata({
   id: "Membership",
   prefixes: {
     "": "http://schema.org/",

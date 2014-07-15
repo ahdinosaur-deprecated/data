@@ -2,7 +2,7 @@ var expect = require('chai').expect;
 var _ = require('lodash');
 var jjv = require('jjv');
 
-var OpenData = require('../')(jjv());
+var opendata = require('../')(jjv());
 var fixtures = {};
 var dir = __dirname + '/fixtures/';
 [
@@ -16,7 +16,7 @@ _.forEach(fixtures, function (fixture) {
   describe(schemaId, function () {
     var Data;
     it("should load", function () {
-      Data = OpenData.define(fixture.schema);
+      Data = opendata(fixture.schema);
       expect(Data).to.have.property('__isOpenData', true);
     });
     it("should correctly .toJSONLD()", function () {
