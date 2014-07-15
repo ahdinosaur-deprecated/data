@@ -11,14 +11,13 @@ var jjv = require('jjv');
 var OpenData = require('opendata')(jjv);
 
 var Person = OpenData.define({
-  id: "/Person",
+  id: "Person",
   prefixes: {
     "": "http://schema.org/",
     "foaf": "http://xmlns.com/foaf/0.1/",
     "org": "http://www.w3.org/TR/vocab-org#",
   },
-  type: "Person",
-  context: "foaf:Person",
+  type: 'object',
   properties: {
     name: {
       type: "string",
@@ -29,7 +28,7 @@ var Person = OpenData.define({
       context: "org:hasMembership",
       items: {
         reverse: "member",
-        "$ref": "/Membership",
+        "$ref": "Membership",
       },
     },
     // TODO 'memberOf' computed (get/set) property
@@ -53,14 +52,14 @@ console.log(bob.toJSONLD())
 //}
 
 var Group = OpenData.define({
-  id: "/Group",
+  id: "Group",
   prefixes: {
     "": "http://schema.org/",
     "foaf": "http://xmlns.com/foaf/0.1#",
     "org": "http://www.w3.org/TR/vocab-org#"
   },
-  type: "Group",
-  context: "org:Organization"
+  type: 'object',
+  context: "org:Organization",
   properties: {
     name: {
       type: "string",
@@ -71,10 +70,10 @@ var Group = OpenData.define({
       items: {
         anyOf: [{
           reverse: "member",
-          "$ref": "/Membership",
+          "$ref": "Membership",
         }, {
           reverse: "group",
-          "$ref": "/Membership",
+          "$ref": "Membership",
         }],
       },
     },
@@ -84,27 +83,25 @@ var Group = OpenData.define({
 });
 
 var Membership = OpenData.define({
-
-  id: "/Membership",
+  id: "Membership",
   prefixes: {
     "": "http://schema.org/",
     "foaf": "http://xmlns.com/foaf/0.1#",
     "org": "http://www.w3.org/TR/vocab-org#"
   },
-  type: "Membership",
   context: "org:Membership"
   properties: {
     member: {
       context: "org:member",
       anyOf: [{
-        "$ref": "/Person",
+        "$ref": "Person",
       }, {
-        "$ref": "/Group",
+        "$ref": "Group",
       }],
     },
     group: {
       "context": "org:organization",
-      "$ref": "/Group"
+      "$ref": "Group"
     },
   },
 });
