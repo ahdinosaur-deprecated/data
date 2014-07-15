@@ -8,12 +8,6 @@ function OpenData (jjv) {
 var opendata = function opendata (schema) {
   var jjv = this.jjv;
 
-  // save type for later
-  var type = schema.type;
-
-  // jjv expects type to be object
-  schema.type = 'object';
-
   // add schema to jjv
   jjv.addSchema(schema.id, schema);
 
@@ -32,7 +26,7 @@ var opendata = function opendata (schema) {
     });
 
     // set type property
-    property("type", schema.type);
+    property("type", schema.id);
 
     // TODO handle nested schemas (by $ref)
 
@@ -95,10 +89,12 @@ var opendata = function opendata (schema) {
       }
       context[key] = val;
     });
+    // get top-level context
+    context[schema.id] = schema.context;
     // get property contexts
-    _.forIn(this._schema.properties, function (propschema, propName) {
-      if (propschema.context) {
-        context[propName] = propschema.context;
+    _.forIn(this._schema.properties, function (propSchema, propName) {
+      if (propSchema.context) {
+        context[propName] = propSchema.context;
       }
     });
     // TODO merge context of nested objects
@@ -108,7 +104,7 @@ var opendata = function opendata (schema) {
   method("toJSONLD", function () {
     return _.extend(this.toJSON(), {
       "@context": this.toContext(),
-      type: type,
+      type: schema.id,
     });
   });
 

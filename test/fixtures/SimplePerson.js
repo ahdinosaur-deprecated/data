@@ -1,11 +1,12 @@
 var test = module.exports = {
   schema: {
-    id: "person",
+    id: "Person",
     prefixes: {
       "": "http://schema.org/",
       "foaf": "http://xmlns.com/foaf/0.1/",
     },
-    type: ["Person", "foaf:Person"],
+    type: 'object',
+    context: 'foaf:Person',
     properties: {
       name: {
         type: "string",
@@ -21,8 +22,9 @@ var test = module.exports = {
       "foaf": "http://xmlns.com/foaf/0.1/",
       "id": "@id",
       "type": "@type",
+      "Person": "foaf:Person",
     },
-    type: ["Person", "foaf:Person"],
+    type: "Person",
     name: "Mikey",
   }],
 };
